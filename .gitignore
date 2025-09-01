@@ -1,11 +1,6 @@
 
 # Archivos de documentación de planificación (no subir)
-/PLAN_DESARROLLO.md
-/DOMAIN_MODELING.md
-/PROJECT_STRUCTURE.md
-/GIT_WORKFLOW.md
-/DELIVERY_CHECKLIST.md
-/SECURITY_SETUP.md
+/docs/
 
 ###> symfony/framework-bundle ###
 /.env.local
