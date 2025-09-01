@@ -1,0 +1,13 @@
+parameters:
+    level: 8
+    paths:
+        - src/
+        - tests/
+    excludePaths:
+        - src/Kernel.php
+    ignoreErrors:
+        # Ignorar errores específicos de Symfony si es necesario
+        - '#Cannot call method [a-zA-Z0-9_]+\(\) on mixed#'
+    
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
