@@ -5,6 +5,7 @@
 /PROJECT_STRUCTURE.md
 /GIT_WORKFLOW.md
 /DELIVERY_CHECKLIST.md
+/SECURITY_SETUP.md
 
 ###> symfony/framework-bundle ###
 /.env.local
