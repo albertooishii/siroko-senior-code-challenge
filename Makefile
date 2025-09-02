@@ -26,9 +26,17 @@ install: ## Instalar dependencias
 	@echo "${GREEN}Instalando dependencias...${NC}"
 	docker compose exec app composer install
 
-test: ## Ejecutar tests
-	@echo "${GREEN}Ejecutando tests...${NC}"
+test: ## Ejecutar todos los tests
+	@echo "${GREEN}Ejecutando todos los tests...${NC}"
 	docker compose exec app ./vendor/bin/phpunit
+
+test-unit: ## Ejecutar solo tests unitarios
+	@echo "${GREEN}Ejecutando tests unitarios...${NC}"
+	docker compose exec app ./vendor/bin/phpunit --exclude-group architecture
+
+test-architecture: ## Ejecutar tests de arquitectura
+	@echo "${GREEN}Ejecutando tests de arquitectura...${NC}"
+	docker compose exec app ./vendor/bin/phpunit tests/Architecture/
 
 cs-fix: ## Corregir estilo de código
 	@echo "${GREEN}Corrigiendo estilo de código...${NC}"
@@ -67,7 +75,7 @@ db-fixtures: ## Cargar fixtures
 setup: up install db-create db-migrate ## Setup completo del proyecto
 	@echo "${GREEN}¡Setup completado! Accede a http://localhost:8080${NC}"
 
-quality: cs-check phpstan test ## Verificar calidad del código
+quality: cs-check phpstan test ## Verificar calidad del código completa
 
 # Default target
 .DEFAULT_GOAL := help
