@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\ValueObject;
 
+use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -12,9 +15,9 @@ class CartId
     public function __construct(string $value)
     {
         if (!Uuid::isValid($value)) {
-            throw new \InvalidArgumentException('Formato UUID inválido para CartId');
+            throw new InvalidArgumentException('Formato UUID inválido para CartId');
         }
-        
+
         $this->value = Uuid::fromString($value);
     }
 

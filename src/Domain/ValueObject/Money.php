@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\ValueObject;
+
+use InvalidArgumentException;
 
 class Money
 {
@@ -9,15 +13,15 @@ class Money
 
     public function __construct(string $amount, string $currency = 'EUR')
     {
-        if (!is_numeric($amount) || (float)$amount < 0) {
-            throw new \InvalidArgumentException('La cantidad debe ser un número positivo');
+        if (!is_numeric($amount) || (float) $amount < 0) {
+            throw new InvalidArgumentException('La cantidad debe ser un número positivo');
         }
 
         if (empty($currency) || strlen($currency) !== 3) {
-            throw new \InvalidArgumentException('La moneda debe ser un código ISO de 3 letras válido');
+            throw new InvalidArgumentException('La moneda debe ser un código ISO de 3 letras válido');
         }
 
-        $this->amount = number_format((float)$amount, 2, '.', '');
+        $this->amount = number_format((float) $amount, 2, '.', '');
         $this->currency = strtoupper($currency);
     }
 
@@ -43,38 +47,38 @@ class Money
 
     public function getAmountAsFloat(): float
     {
-        return (float)$this->amount;
+        return (float) $this->amount;
     }
 
     public function add(Money $other): self
     {
         $this->ensureSameCurrency($other);
         $newAmount = $this->getAmountAsFloat() + $other->getAmountAsFloat();
-        
-        return new self((string)$newAmount, $this->currency);
+
+        return new self((string) $newAmount, $this->currency);
     }
 
     public function subtract(Money $other): self
     {
         $this->ensureSameCurrency($other);
         $newAmount = $this->getAmountAsFloat() - $other->getAmountAsFloat();
-        
+
         if ($newAmount < 0) {
-            throw new \InvalidArgumentException('La resta resultaría en una cantidad negativa');
+            throw new InvalidArgumentException('La resta resultaría en una cantidad negativa');
         }
-        
-        return new self((string)$newAmount, $this->currency);
+
+        return new self((string) $newAmount, $this->currency);
     }
 
     public function multiply(int $multiplier): self
     {
         if ($multiplier < 0) {
-            throw new \InvalidArgumentException('El multiplicador debe ser positivo');
+            throw new InvalidArgumentException('El multiplicador debe ser positivo');
         }
-        
+
         $newAmount = $this->getAmountAsFloat() * $multiplier;
-        
-        return new self((string)$newAmount, $this->currency);
+
+        return new self((string) $newAmount, $this->currency);
     }
 
     public function equals(Money $other): bool
@@ -85,12 +89,14 @@ class Money
     public function greaterThan(Money $other): bool
     {
         $this->ensureSameCurrency($other);
+
         return $this->getAmountAsFloat() > $other->getAmountAsFloat();
     }
 
     public function lessThan(Money $other): bool
     {
         $this->ensureSameCurrency($other);
+
         return $this->getAmountAsFloat() < $other->getAmountAsFloat();
     }
 
@@ -112,7 +118,7 @@ class Money
     private function ensureSameCurrency(Money $other): void
     {
         if ($this->currency !== $other->currency) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('Diferencia de moneda: %s vs %s', $this->currency, $other->currency)
             );
         }

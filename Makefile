@@ -1,5 +1,5 @@
 # Makefile para Siroko Cart & Checkout API
-.PHONY: help up down build install test cs-fix cs-check phpstan cache-clear logs bash db-create db-migrate
+.PHONY: help up down build install test cs-fix cs-check phpstan cache-clear logs bash db-create db-migrate db-fixtures deps-only check quality fix install-hooks
 
 # Colores para output
 GREEN=\033[0;32m
@@ -22,9 +22,16 @@ build: ## Construir contenedores Docker
 	@echo "${GREEN}Construyendo contenedores...${NC}"
 	docker compose build --no-cache
 
-install: ## Instalar dependencias
+install: up ## Setup completo del proyecto (contenedores + dependencias + BD + hooks)
 	@echo "${GREEN}Instalando dependencias...${NC}"
 	docker compose exec app composer install
+	@echo "${GREEN}Creando base de datos...${NC}"
+	docker compose exec app php bin/console doctrine:database:create --if-not-exists
+	@echo "${GREEN}Ejecutando migraciones...${NC}"
+	docker compose exec app php bin/console doctrine:migrations:migrate --no-interaction
+	@$(MAKE) install-hooks
+	@echo "${GREEN}🎉 ¡Setup completado! Accede a http://localhost:8080${NC}"
+	@echo "${GREEN}Los git hooks están instalados y se ejecutarán automáticamente en cada commit${NC}"
 
 test: ## Ejecutar todos los tests
 	@echo "${GREEN}Ejecutando todos los tests...${NC}"
@@ -72,10 +79,27 @@ db-fixtures: ## Cargar fixtures
 	@echo "${GREEN}Cargando fixtures...${NC}"
 	docker compose exec app php bin/console doctrine:fixtures:load --no-interaction
 
-setup: up install db-create db-migrate ## Setup completo del proyecto
-	@echo "${GREEN}¡Setup completado! Accede a http://localhost:8080${NC}"
+deps-only: ## Solo instalar dependencias de Composer
+	@echo "${GREEN}Instalando solo dependencias de Composer...${NC}"
+	docker compose exec app composer install
 
 quality: cs-check phpstan test ## Verificar calidad del código completa
+
+check: cs-check phpstan ## Verificar código sin ejecutar tests
+	@echo "${GREEN}Verificación de código completada${NC}"
+
+fix: cs-fix ## Alias para cs-fix
+	@echo "${GREEN}Código formateado${NC}"
+
+install-hooks: ## Instalar git hooks automáticamente
+	@echo "${GREEN}Instalando git hooks...${NC}"
+	@if [ -d .git ]; then \
+		cp .githooks/pre-commit .git/hooks/pre-commit; \
+		chmod +x .git/hooks/pre-commit; \
+		echo "${GREEN}✅ Git hooks instalados correctamente${NC}"; \
+	else \
+		echo "${YELLOW}⚠️  No es un repositorio git, hooks no instalados${NC}"; \
+	fi
 
 # Default target
 .DEFAULT_GOAL := help

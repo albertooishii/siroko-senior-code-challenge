@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\CartItemRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use InvalidArgumentException;
 
 #[ORM\Entity(repositoryClass: CartItemRepository::class)]
 class CartItem
@@ -32,15 +36,21 @@ class CartItem
     private ?string $subtotal = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
-    public function __construct()
+    public function __construct(?Product $product = null, ?int $quantity = null)
     {
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->product = $product;
+        $this->quantity = $quantity;
+        if ($product) {
+            $this->unitPrice = $product->getPrice();
+        }
+        $this->calculateSubtotal();
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -110,26 +120,38 @@ class CartItem
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function updateQuantity(int $quantity): static
+    {
+        if ($quantity <= 0) {
+            throw new InvalidArgumentException('Quantity must be positive');
+        }
+        $this->quantity = $quantity;
+        $this->calculateSubtotal();
+        $this->updatedAt = new DateTimeImmutable();
 
         return $this;
     }
@@ -139,7 +161,7 @@ class CartItem
         if ($this->quantity && $this->unitPrice) {
             $subtotal = floatval($this->unitPrice) * $this->quantity;
             $this->subtotal = number_format($subtotal, 2, '.', '');
-            $this->updatedAt = new \DateTimeImmutable();
+            $this->updatedAt = new DateTimeImmutable();
         }
     }
 }
