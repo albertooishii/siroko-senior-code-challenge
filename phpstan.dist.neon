@@ -4,3 +4,5 @@ parameters:
         - src/
     excludePaths:
         - src/Kernel.php
+    ignoreErrors:
+        - '#Property .* is never assigned int so it can be removed from the property type#'

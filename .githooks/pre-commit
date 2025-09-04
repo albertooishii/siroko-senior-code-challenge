@@ -1,0 +1,39 @@
+#!/bin/bash
+# Pre-commit hook que ejecuta las verificaciones de calidad
+
+echo "🔍 Ejecutando verificaciones pre-commit..."
+
+# Cambiar al directorio del proyecto
+cd "$(git rev-parse --show-toplevel)"
+
+# Verificar que Docker esté funcionando
+if ! docker compose ps | grep -q "Up"; then
+    echo "❌ Docker compose no está ejecutándose. Ejecuta: make up"
+    exit 1
+fi
+
+# Ejecutar verificaciones
+echo "📝 Verificando formato de código..."
+if ! make cs-check > /dev/null 2>&1; then
+    echo "❌ Errores de formato encontrados. Ejecutando corrección automática..."
+    make cs-fix
+    echo "✅ Formato corregido. Por favor, haz add y commit nuevamente."
+    exit 1
+fi
+
+echo "🔬 Ejecutando análisis estático..."
+if ! make phpstan > /dev/null 2>&1; then
+    echo "❌ Errores en análisis estático. Revisa los errores:"
+    make phpstan
+    exit 1
+fi
+
+echo "🧪 Ejecutando tests..."
+if ! make test > /dev/null 2>&1; then
+    echo "❌ Tests fallando. Revisa los errores:"
+    make test
+    exit 1
+fi
+
+echo "✅ Todas las verificaciones pasaron correctamente!"
+exit 0
