@@ -1,0 +1,50 @@
+# Infrastructure Services Configuration
+services:
+    # Repository Implementations
+    App\Infrastructure\Persistence\Doctrine\Repository\DoctrineCartRepository:
+        tags: ['doctrine.repository_service']
+
+    App\Infrastructure\Persistence\Doctrine\Repository\DoctrineProductRepository:
+        tags: ['doctrine.repository_service']
+
+    App\Infrastructure\Persistence\Doctrine\Repository\DoctrineOrderRepository:
+        tags: ['doctrine.repository_service']
+
+    # Repository Interfaces Binding
+    App\Domain\Repository\CartRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Repository\DoctrineCartRepository
+
+    App\Domain\Repository\ProductRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Repository\DoctrineProductRepository
+
+    App\Domain\Repository\OrderRepositoryInterface:
+        alias: App\Infrastructure\Persistence\Doctrine\Repository\DoctrineOrderRepository
+
+    # Command Handlers
+    App\Application\Command\AddItemToCartCommandHandler:
+        arguments:
+            $cartRepository: '@App\Domain\Repository\CartRepositoryInterface'
+            $productRepository: '@App\Domain\Repository\ProductRepositoryInterface'
+        tags: ['messenger.message_handler']
+
+    App\Application\Command\UpdateCartItemQuantityCommandHandler:
+        arguments:
+            $cartRepository: '@App\Domain\Repository\CartRepositoryInterface'
+        tags: ['messenger.message_handler']
+
+    App\Application\Command\RemoveItemFromCartCommandHandler:
+        arguments:
+            $cartRepository: '@App\Domain\Repository\CartRepositoryInterface'
+        tags: ['messenger.message_handler']
+
+    App\Application\Command\CheckoutCartCommandHandler:
+        arguments:
+            $cartRepository: '@App\Domain\Repository\CartRepositoryInterface'
+            $orderRepository: '@App\Domain\Repository\OrderRepositoryInterface'
+        tags: ['messenger.message_handler']
+
+    # Query Handlers
+    App\Application\Query\GetCartQueryHandler:
+        arguments:
+            $cartRepository: '@App\Domain\Repository\CartRepositoryInterface'
+        tags: ['messenger.message_handler']
