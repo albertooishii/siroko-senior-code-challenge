@@ -20,31 +20,4 @@ services:
     App\Domain\Repository\OrderRepositoryInterface:
         alias: App\Infrastructure\Persistence\Doctrine\Repository\DoctrineOrderRepository
 
-    # Command Handlers
-    App\Application\Command\AddItemToCartCommandHandler:
-        arguments:
-            $cartRepository: '@App\Domain\Repository\CartRepositoryInterface'
-            $productRepository: '@App\Domain\Repository\ProductRepositoryInterface'
-        tags: ['messenger.message_handler']
-
-    App\Application\Command\UpdateCartItemQuantityCommandHandler:
-        arguments:
-            $cartRepository: '@App\Domain\Repository\CartRepositoryInterface'
-        tags: ['messenger.message_handler']
-
-    App\Application\Command\RemoveItemFromCartCommandHandler:
-        arguments:
-            $cartRepository: '@App\Domain\Repository\CartRepositoryInterface'
-        tags: ['messenger.message_handler']
-
-    App\Application\Command\CheckoutCartCommandHandler:
-        arguments:
-            $cartRepository: '@App\Domain\Repository\CartRepositoryInterface'
-            $orderRepository: '@App\Domain\Repository\OrderRepositoryInterface'
-        tags: ['messenger.message_handler']
-
-    # Query Handlers
-    App\Application\Query\GetCartQueryHandler:
-        arguments:
-            $cartRepository: '@App\Domain\Repository\CartRepositoryInterface'
-        tags: ['messenger.message_handler']
+    # Command and Query Handlers are auto-configured via #[AsMessageHandler] attributes

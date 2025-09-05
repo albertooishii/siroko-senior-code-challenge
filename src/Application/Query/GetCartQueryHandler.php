@@ -8,7 +8,9 @@ use App\Application\DTO\CartDTO;
 use App\Application\DTO\CartItemDTO;
 use App\Domain\Repository\CartRepositoryInterface;
 use App\Domain\ValueObject\CartId;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler(method: 'handle')]
 final readonly class GetCartQueryHandler
 {
     public function __construct(
@@ -37,7 +39,7 @@ final readonly class GetCartQueryHandler
         }
 
         return new CartDTO(
-            cartId: $cart->getSessionId() ?? '',
+            id: $cart->getId(),
             items: $items,
             totalPrice: $cart->getTotalPrice() ?? '0.00',
             itemCount: $cart->getCartItems()->count()

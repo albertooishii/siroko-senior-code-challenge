@@ -5,44 +5,42 @@ declare(strict_types=1);
 namespace App\Domain\ValueObject;
 
 use InvalidArgumentException;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 
 class CartId
 {
-    private readonly UuidInterface $value;
+    private readonly int $value;
 
-    public function __construct(string $value)
+    public function __construct(int $value)
     {
-        if (!Uuid::isValid($value)) {
-            throw new InvalidArgumentException('Formato UUID inválido para CartId');
+        if ($value <= 0) {
+            throw new InvalidArgumentException('CartId debe ser un entero positivo');
         }
 
-        $this->value = Uuid::fromString($value);
+        $this->value = $value;
     }
 
     public static function generate(): self
     {
-        return new self(Uuid::uuid4()->toString());
+        return new self(rand(1, 999999));
     }
 
-    public static function fromString(string $value): self
+    public static function fromInt(int $value): self
     {
         return new self($value);
     }
 
-    public function getValue(): string
+    public function getValue(): int
     {
-        return $this->value->toString();
+        return $this->value;
     }
 
     public function equals(CartId $other): bool
     {
-        return $this->value->equals($other->value);
+        return $this->value === $other->value;
     }
 
     public function __toString(): string
     {
-        return $this->getValue();
+        return (string) $this->getValue();
     }
 }

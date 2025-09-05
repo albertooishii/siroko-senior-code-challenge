@@ -28,7 +28,7 @@ class DoctrineProductRepository extends ServiceEntityRepository implements Produ
     public function findByProductId(ProductId $productId): ?Product
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.productId.value = :productId')
+            ->andWhere('p.id = :productId')
             ->setParameter('productId', $productId->getValue())
             ->getQuery()
             ->getOneOrNullResult();

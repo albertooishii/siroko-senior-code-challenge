@@ -285,8 +285,8 @@ class CartApiTest extends WebTestCase
         // Use raw SQL to insert test product
         $connection = $entityManager->getConnection();
         $connection->executeStatement(
-            'INSERT INTO products (id, name, price) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING',
-            [1, 'Test Product', 1000] // 10.00 EUR in cents
+            'INSERT INTO product (id, name, price, stock, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO NOTHING',
+            [1, 'Test Product', '10.00', 100, '2024-01-01 00:00:00', '2024-01-01 00:00:00']
         );
 
         $this->productId = 1;

@@ -7,7 +7,7 @@ namespace App\Application\Query;
 final readonly class GetCartQuery
 {
     public function __construct(
-        public string $cartId,
+        public int $cartId,
     ) {
     }
 }

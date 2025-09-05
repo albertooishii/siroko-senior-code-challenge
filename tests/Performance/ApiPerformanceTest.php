@@ -191,10 +191,25 @@ class ApiPerformanceTest extends WebTestCase
 
     public function testConcurrentRequestsPerformance(): void
     {
-        $this->markTestSkipped('Concurrent performance testing requires specific infrastructure setup');
+        // Simulate concurrent requests by making multiple sequential requests quickly
+        $startTime = microtime(true);
 
-        // This would test multiple simultaneous requests
-        // Left as placeholder for real performance testing scenarios
+        $responses = [];
+        for ($i = 0; $i < 5; ++$i) {
+            $this->client->request('POST', '/api/carts');
+            $responses[] = $this->client->getResponse()->getStatusCode();
+        }
+
+        $endTime = microtime(true);
+        $totalTime = $endTime - $startTime;
+
+        // Verify all requests succeeded
+        foreach ($responses as $statusCode) {
+            $this->assertEquals(201, $statusCode);
+        }
+
+        // Should handle 5 requests reasonably quickly (less than 2 seconds)
+        $this->assertLessThan(2.0, $totalTime, 'Multiple cart creation requests took too long');
     }
 
     public function testCartWithManyItemsPerformance(): void
@@ -243,8 +258,8 @@ class ApiPerformanceTest extends WebTestCase
         // Insert test products for performance testing
         for ($i = 1; $i <= 10; ++$i) {
             $connection->executeStatement(
-                'INSERT INTO products (id, name, price) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING',
-                [$i, "Performance Test Product {$i}", $i * 100]
+                'INSERT INTO product (id, name, price, stock, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO NOTHING',
+                [$i, "Performance Test Product {$i}", $i * 1.00, 100, '2024-01-01 00:00:00', '2024-01-01 00:00:00']
             );
         }
     }

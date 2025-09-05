@@ -1,5 +1,5 @@
-# Archivos de documentación de planificación (no subir)
-/docs/
+# Archivos temporales y configuración local
+# (docs/ ahora se incluye en el repositorio)
 
 ###> symfony/framework-bundle ###
 /.env.local

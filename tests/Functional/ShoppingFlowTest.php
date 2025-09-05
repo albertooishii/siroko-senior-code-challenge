@@ -252,13 +252,13 @@ class ShoppingFlowTest extends WebTestCase
 
         // Insert test products
         $connection->executeStatement(
-            'INSERT INTO products (id, name, price) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING',
-            [1, 'Test Product 1', 1000] // 10.00 EUR
+            'INSERT INTO product (id, name, price, stock, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO NOTHING',
+            [1, 'Test Product 1', '10.00', 100, '2024-01-01 00:00:00', '2024-01-01 00:00:00']
         );
 
         $connection->executeStatement(
-            'INSERT INTO products (id, name, price) VALUES (?, ?, ?) ON CONFLICT (id) DO NOTHING',
-            [2, 'Test Product 2', 1500] // 15.00 EUR
+            'INSERT INTO product (id, name, price, stock, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO NOTHING',
+            [2, 'Test Product 2', '15.00', 100, '2024-01-01 00:00:00', '2024-01-01 00:00:00']
         );
     }
 }

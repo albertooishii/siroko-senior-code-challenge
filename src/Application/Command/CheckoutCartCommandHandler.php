@@ -11,7 +11,9 @@ use App\Domain\ValueObject\OrderId;
 use App\Entity\Order;
 use App\Entity\OrderItem;
 use InvalidArgumentException;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler(method: 'handle')]
 final readonly class CheckoutCartCommandHandler
 {
     public function __construct(
@@ -47,6 +49,7 @@ final readonly class CheckoutCartCommandHandler
             $orderItem = new OrderItem();
             $orderItem->setOrder($order);
             $orderItem->setProduct($cartItem->getProduct());
+            $orderItem->setProductName($cartItem->getProduct()->getName()); // Añadir nombre del producto
             $orderItem->setQuantity($cartItem->getQuantity());
             $orderItem->setUnitPrice($cartItem->getUnitPrice());
             $orderItem->setSubtotal($cartItem->getSubtotal());

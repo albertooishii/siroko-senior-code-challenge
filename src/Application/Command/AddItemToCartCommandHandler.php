@@ -9,8 +9,11 @@ use App\Domain\Repository\ProductRepositoryInterface;
 use App\Domain\ValueObject\CartId;
 use App\Domain\ValueObject\ProductId;
 use App\Entity\CartItem;
+use App\Infrastructure\Exception\ProductNotFoundException;
 use InvalidArgumentException;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler(method: 'handle')]
 final readonly class AddItemToCartCommandHandler
 {
     public function __construct(
@@ -22,13 +25,17 @@ final readonly class AddItemToCartCommandHandler
     public function handle(AddItemToCartCommand $command): void
     {
         $cartId = new CartId($command->cartId);
-        $productId = ProductId::fromString($command->productId);
+        $productId = ProductId::fromInt($command->productId);
 
         $cart = $this->cartRepository->findByCartId($cartId);
         $product = $this->productRepository->findByProductId($productId);
 
-        if (!$cart || !$product) {
-            throw new InvalidArgumentException('Cart or Product not found');
+        if (!$cart) {
+            throw new InvalidArgumentException('Cart not found');
+        }
+
+        if (!$product) {
+            throw new ProductNotFoundException('Product not found');
         }
 
         // Verify stock

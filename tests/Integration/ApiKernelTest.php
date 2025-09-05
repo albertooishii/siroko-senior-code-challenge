@@ -25,9 +25,12 @@ class ApiKernelTest extends KernelTestCase
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
 
         $responseData = json_decode($response->getContent(), true);
-        $this->assertArrayHasKey('success', $responseData);
-        $this->assertTrue($responseData['success']);
-        $this->assertArrayHasKey('data', $responseData);
+        $this->assertArrayHasKey('id', $responseData);
+        $this->assertArrayHasKey('sessionId', $responseData);
+        $this->assertArrayHasKey('items', $responseData);
+        $this->assertArrayHasKey('total', $responseData);
+        $this->assertIsInt($responseData['id']);
+        $this->assertIsArray($responseData['items']);
     }
 
     public function testGetNonExistentCart(): void
@@ -37,17 +40,12 @@ class ApiKernelTest extends KernelTestCase
         $request = Request::create('/api/carts/99999', 'GET');
         $response = $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, false);
 
-        // Should be 404 (not found) or 400 (bad request) - both are acceptable for non-existent resource
-        $this->assertContains($response->getStatusCode(), [400, 404],
-            'Expected 400 or 404 for non-existent cart, got ' . $response->getStatusCode());
+        // Should be 404 for non-existent cart
+        $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
 
         $responseData = json_decode($response->getContent(), true);
-        $this->assertArrayHasKey('success', $responseData);
-        $this->assertFalse($responseData['success']);
         $this->assertArrayHasKey('error', $responseData);
-
-        // Debug: see what error message we get
-        echo 'Error message: ' . $responseData['error'] . "\n";
+        $this->assertEquals('Cart not found', $responseData['error']);
     }
 }

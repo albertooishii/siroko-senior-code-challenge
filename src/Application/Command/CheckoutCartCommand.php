@@ -7,7 +7,7 @@ namespace App\Application\Command;
 final readonly class CheckoutCartCommand
 {
     public function __construct(
-        public string $cartId,
+        public int $cartId,
         public string $customerEmail,
         public ?string $customerName = null,
     ) {

@@ -135,7 +135,7 @@ class Product
 
     public function getProductId(): ?\App\Domain\ValueObject\ProductId
     {
-        return $this->id ? \App\Domain\ValueObject\ProductId::fromString((string) $this->id) : null;
+        return $this->id ? \App\Domain\ValueObject\ProductId::fromInt($this->id) : null;
     }
 
     public function hasStock(int $requestedQuantity = 1): bool

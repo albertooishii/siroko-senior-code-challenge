@@ -8,8 +8,12 @@ use App\Domain\Repository\CartRepositoryInterface;
 use App\Domain\Repository\ProductRepositoryInterface;
 use App\Domain\ValueObject\CartId;
 use App\Domain\ValueObject\ProductId;
+use App\Infrastructure\Exception\CartItemNotFoundException;
+use App\Infrastructure\Exception\ProductNotFoundException;
 use InvalidArgumentException;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler(method: 'handle')]
 final readonly class UpdateCartItemQuantityCommandHandler
 {
     public function __construct(
@@ -21,13 +25,17 @@ final readonly class UpdateCartItemQuantityCommandHandler
     public function handle(UpdateCartItemQuantityCommand $command): void
     {
         $cartId = new CartId($command->cartId);
-        $productId = ProductId::fromString($command->productId);
+        $productId = ProductId::fromInt($command->productId);
 
         $cart = $this->cartRepository->findByCartId($cartId);
         $product = $this->productRepository->findByProductId($productId);
 
-        if (!$cart || !$product) {
-            throw new InvalidArgumentException('Cart or Product not found');
+        if (!$cart) {
+            throw new InvalidArgumentException('Cart not found');
+        }
+
+        if (!$product) {
+            throw new ProductNotFoundException('Product not found');
         }
 
         // Verify stock for new quantity
@@ -46,6 +54,6 @@ final readonly class UpdateCartItemQuantityCommandHandler
             }
         }
 
-        throw new InvalidArgumentException('Item not found in cart');
+        throw new CartItemNotFoundException('Item not found in cart');
     }
 }

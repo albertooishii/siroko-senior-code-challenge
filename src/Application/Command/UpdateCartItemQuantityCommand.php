@@ -9,8 +9,8 @@ use InvalidArgumentException;
 final readonly class UpdateCartItemQuantityCommand
 {
     public function __construct(
-        public string $cartId,
-        public string $productId,
+        public int $cartId,
+        public int $productId,
         public int $quantity,
     ) {
         if ($quantity <= 0) {

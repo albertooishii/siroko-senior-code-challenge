@@ -28,7 +28,7 @@ class DoctrineCartRepository extends ServiceEntityRepository implements CartRepo
     public function findByCartId(CartId $cartId): ?Cart
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.cartId.value = :cartId')
+            ->andWhere('c.id = :cartId')
             ->setParameter('cartId', $cartId->getValue())
             ->getQuery()
             ->getOneOrNullResult();
