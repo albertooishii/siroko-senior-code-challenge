@@ -1,0 +1,12 @@
+framework:
+    test: true
+    session:
+        storage_factory_id: session.storage.factory.mock_file
+    router:
+        utf8: true
+    
+doctrine:
+    dbal:
+        # Use SQLite for tests for better isolation
+        url: sqlite:///%kernel.project_dir%/var/data/test.db
+        driver: 'pdo_sqlite'
